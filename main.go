@@ -7,8 +7,7 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/minpeter/grpc-web-example/gen/helloworld"
-
+	pb "github.com/minpeter/grpc-web-example/gen"
 	"google.golang.org/grpc"
 )
 
@@ -26,10 +25,10 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
 }
 
-// server streaming call SayRepeatHello
+// SayRepeatHello implements helloworld.GreeterServer
 func (s *server) SayRepeatHello(in *pb.RepeatHelloRequest, stream pb.Greeter_SayRepeatHelloServer) error {
 	log.Printf("Received: %v", in.GetName())
-	for i := 0; i < 10; i++ {
+	for i := range 4 {
 		if err := stream.Send(&pb.HelloReply{Message: "Hello " + in.GetName() + fmt.Sprintf(" %d", i)}); err != nil {
 			return err
 		}
@@ -38,15 +37,18 @@ func (s *server) SayRepeatHello(in *pb.RepeatHelloRequest, stream pb.Greeter_Say
 }
 
 func main() {
-
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
+	// http server
+
 	s := grpc.NewServer()
 	pb.RegisterGreeterServer(s, &server{})
 	log.Printf("server listening at %v", lis.Addr())
+
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

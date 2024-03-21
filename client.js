@@ -1,8 +1,8 @@
 const {
   HelloRequest,
   RepeatHelloRequest,
-} = require("./gen/helloworld/helloworld_grpc_web_pb.js");
-const { GreeterClient } = require("./gen/helloworld/helloworld_pb.js");
+} = require("./gen/helloworld_grpc_web_pb.js");
+const { GreeterClient } = require("./gen/helloworld_pb.js");
 
 var client = new GreeterClient(
   "http://" + window.location.hostname + ":8080",
